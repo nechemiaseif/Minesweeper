@@ -7,6 +7,7 @@ namespace Minesweeper.Models
         private bool isRevealed, isFlagged;
         private string text;
         private Color foreColor, backColor;
+
         public int Row { get; set; }
         public int Col { get; set; }
         public bool HasMine { get; set; }
@@ -56,7 +57,6 @@ namespace Minesweeper.Models
             }
         }
 
-        // TODO refactor UI-related properties to View
         public string Text
         {
             get
@@ -74,7 +74,6 @@ namespace Minesweeper.Models
             }
         }
 
-        // TODO refactor UI-related properties to View
         public Color ForeColor
         {
             get
@@ -92,7 +91,6 @@ namespace Minesweeper.Models
             }
         }
 
-        // TODO refactor UI-related properties to View
         public Color BackColor
         {
             get
@@ -110,7 +108,6 @@ namespace Minesweeper.Models
             }
         }
 
-        // TODO refactor UI-related properties to View
         public string GetCellText()
         {
             if (!IsRevealed)
@@ -131,7 +128,6 @@ namespace Minesweeper.Models
             return NumNeighborsWithMines.ToString("D");
         }
 
-        // TODO refactor UI-related properties to View
         public Color GetCellForeColor()
         {
 
@@ -150,7 +146,6 @@ namespace Minesweeper.Models
             };
         }
 
-        // TODO refactor UI-related properties to View
         public Color GetCellBackColor() => IsRevealed ? Color.Tan : Color.YellowGreen;
     }
 }

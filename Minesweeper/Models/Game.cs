@@ -7,11 +7,12 @@ namespace Minesweeper.Models
         private TimeSpan timeElapsed;
 
         public bool HasBegun { get; set; }
-
+        public Difficulty Difficulty { get; set; }
         public Board Board { get; private set; }
 
         public Game()
         {
+            // TODO allow choosing difficulty
             Board = new Board(Difficulty.Easy);
             TimeElapsed = new TimeSpan();
         }

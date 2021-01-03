@@ -5,20 +5,16 @@ namespace Minesweeper.Models
     public class Board : NotifyPropertyChangedModel
     {
         private int flagsRemaining;
+
         public int Rows { get; set; }
         public int Cols { get; set; }
         public int Mines { get; set; }
         public int CellsRevealed { get; private set; }
         public Cell[,] Grid { get; set; }
 
-        // TODO maybe refactor difficulty to Game class
-        public Difficulty Difficulty { get; set; }
-
         public Board(Difficulty difficulty)
         {
-            Difficulty = difficulty;
-
-            Init();
+            Init(difficulty);
         }
 
         public int FlagsRemaining
@@ -38,9 +34,9 @@ namespace Minesweeper.Models
             }
         }
 
-        private void Init()
+        private void Init(Difficulty difficulty)
         {
-            switch (Difficulty)
+            switch (difficulty)
             {
                 case Difficulty.Easy:
                     Rows = 8;
