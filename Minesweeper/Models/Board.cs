@@ -59,8 +59,6 @@ namespace Minesweeper.Models
             }
 
             InitBoard();
-            PlaceMines();
-            CalculateCellNeighbors();
         }
 
         private void InitBoard()
@@ -86,16 +84,19 @@ namespace Minesweeper.Models
                 int row = rand.Next(0, Rows);
                 int col = rand.Next(0, Cols);
 
-                if (!Grid[row, col].HasMine)
+                Cell cell = Grid[row, col];
+
+                if (cell.CellValue != CellValue.Mine
+                    && cell.CellValue != CellValue.NonMinePlaceholder)
                 {
-                    Grid[row, col].HasMine = true;
+                    cell.CellValue = CellValue.Mine;
                     minesPlaced++;
                 }
             }
 
         }
 
-        private void CalculateCellNeighbors()
+        private void CalculateCellValues()
         {
             for (int currentRow = 0; currentRow < Rows; currentRow++)
             {
@@ -103,26 +104,50 @@ namespace Minesweeper.Models
                 {
                     Cell currentCell = Grid[currentRow, currentCol];
 
-                    if (currentCell.HasMine)
+                    if (currentCell.CellValue == CellValue.NonMinePlaceholder)
                     {
-                        currentCell.NumNeighborsWithMines = CellNumber.Mine;
-                        continue;
+                        currentCell.CellValue++;
                     }
 
                     for (int neighboringRow = currentRow - 1; neighboringRow <= currentRow + 1; neighboringRow++)
                     {
                         for (int neighboringCol = currentCol - 1; neighboringCol <= currentCol + 1; neighboringCol++)
                         {
-                            if (IsValidRowCol(neighboringRow, neighboringCol)
-                                && !(neighboringRow == currentRow && neighboringCol == currentCol)
-                                && Grid[neighboringRow, neighboringCol].HasMine)
+                            if (IsValidRowCol(neighboringRow, neighboringCol))
                             {
-                                currentCell.NumNeighborsWithMines++;
+                                if (!(neighboringRow == currentRow && neighboringCol == currentCol)
+                                    && Grid[neighboringRow, neighboringCol].CellValue == CellValue.Mine)
+                                {
+                                    currentCell.CellValue++;
+                                }
                             }
                         }
                     }
                 }
             }
+        }
+
+        public void RevealFirstCell(Cell cell)
+        {
+            cell.CellValue = CellValue.Zero;
+            cell.IsRevealed = true;
+            CellsRevealed++;
+
+            for (int neighboringRow = cell.Row - 1; neighboringRow <= cell.Row + 1; neighboringRow++)
+            {
+                for (int neighboringCol = cell.Col - 1; neighboringCol <= cell.Col + 1; neighboringCol++)
+                {
+                    if (IsValidRowCol(neighboringRow, neighboringCol)
+                        && !(neighboringRow == cell.Row && neighboringCol == cell.Col))
+                    {
+                        Grid[neighboringRow, neighboringCol].CellValue = CellValue.NonMinePlaceholder;
+                    }
+                }
+            }
+
+            PlaceMines();
+            CalculateCellValues();
+            RevealNeighbors(cell);
         }
 
         public void RevealCell(Cell cell)
@@ -132,28 +157,9 @@ namespace Minesweeper.Models
                 cell.IsRevealed = true;
                 CellsRevealed++;
 
-                if (cell.NumNeighborsWithMines == CellNumber.Zero)
+                if (cell.CellValue == CellValue.Zero)
                 {
                     RevealNeighbors(cell);
-                }
-            }
-        }
-
-        public void ToggleFlag(Cell cell)
-        {
-            if (!cell.IsRevealed)
-            {
-                if (cell.IsFlagged)
-                {
-                    cell.IsFlagged = false;
-                    FlagsRemaining++;
-                    return;
-                }
-
-                if (FlagsRemaining > 0)
-                {
-                    cell.IsFlagged = true;
-                    FlagsRemaining--;
                 }
             }
         }
@@ -182,7 +188,26 @@ namespace Minesweeper.Models
             }
         }
 
-        public void RevealAllMines()
+        public void ToggleFlag(Cell cell)
+        {
+            if (!cell.IsRevealed)
+            {
+                if (cell.IsFlagged)
+                {
+                    cell.IsFlagged = false;
+                    FlagsRemaining++;
+                    return;
+                }
+
+                if (FlagsRemaining > 0)
+                {
+                    cell.IsFlagged = true;
+                    FlagsRemaining--;
+                }
+            }
+        }
+
+        public void RevealAllMinesAndMistakenFlags()
         {
             for (int row = 0; row < Rows; row++)
             {
@@ -190,9 +215,13 @@ namespace Minesweeper.Models
                 {
                     Cell cell = Grid[row, col];
 
-                    if (cell.HasMine)
+                    if (cell.CellValue == CellValue.Mine)
                     {
                         RevealCell(cell);
+                    }
+                    else if (cell.IsFlagged)
+                    {
+                        cell.Text = "X";
                     }
                 }
             }

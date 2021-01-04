@@ -7,9 +7,10 @@
         Hard
     }
 
-    public enum CellNumber
+    public enum CellValue
     {
-        Mine = -1,
+        Mine = -2,
+        NonMinePlaceholder,
         Zero,
         One,
         Two,

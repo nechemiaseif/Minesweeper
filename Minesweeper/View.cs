@@ -20,11 +20,8 @@ namespace Minesweeper
         private void DifficultyComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             ComboBox difficultyComboBox = (ComboBox)sender;
-            View newGameView = new View((Difficulty)difficultyComboBox.SelectedItem);
 
-            Hide();
-            newGameView.ShowDialog();
-            Close();
+            StartNewGame((Difficulty)difficultyComboBox.SelectedItem);
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -39,25 +36,31 @@ namespace Minesweeper
 
             if (!Game.HasBegun && e.Button == MouseButtons.Left)
             {
-                timer.Enabled = true;
-                timer.Start();
-                Game.HasBegun = true;
+                BeginGame();
             }
 
             if (!cell.IsRevealed)
             {
-
                 switch (e.Button)
                 {
                     case MouseButtons.Left:
-                        Game.Board.RevealCell(cell);
-                        if (cell.HasMine)
+                        if(Game.Board.CellsRevealed == 0)
                         {
-                            LoseGame();
+                            Game.Board.RevealFirstCell(cell);
                         }
-                        if (Game.WasBeaten())
+                        else
                         {
-                            WinGame();
+                            Game.Board.RevealCell(cell);
+                        }
+
+                        if (cell.CellValue == CellValue.Mine)
+                        {
+                            Game.Board.RevealAllMinesAndMistakenFlags();
+                            EndGame();
+                        }
+                        else if (Game.HasBeenWon())
+                        {
+                            EndGame();
                         }
                         break;
                     case MouseButtons.Right:
@@ -77,31 +80,35 @@ namespace Minesweeper
         };
 
 
-        private void LoseGame()
+        private void BeginGame()
         {
-            Game.Board.RevealAllMines();
-            PromptRestart();
+            timer.Start();
+            Game.HasBegun = true;
         }
 
-        private void WinGame()
+        private void EndGame()
         {
-            MessageBox.Show("Woohoo, you won!");
+            timer.Stop();
             PromptRestart();
         }
 
         private void PromptRestart()
         {
-            if (MessageBox.Show(Game.WasBeaten() ? "Play again?" : "Try again?", "Game Over", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (MessageBox.Show(Game.HasBeenWon() ? "You win! Play again?" : "Try again?", "Game Over", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                Restart();
+                StartNewGame(Game.Difficulty);
             }
 
             Application.Exit();
         }
 
-        private void Restart()
+        private void StartNewGame(Difficulty difficulty)
         {
-            Process.Start(Process.GetCurrentProcess().MainModule.FileName);
+            View newGameView = new View(difficulty);
+
+            Hide();
+            newGameView.ShowDialog();
+            Close();
         }
     }
 }

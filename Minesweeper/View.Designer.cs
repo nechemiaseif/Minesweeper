@@ -123,8 +123,8 @@ namespace Minesweeper
             // View
             // 
             this.Text = "Minesweeper";
-            this.Controls.AddRange(new Control[] { this.boardTableLayoutPanel, this.headerGroupBox });
             this.AutoSize = true;
+            this.Controls.AddRange(new Control[] { this.boardTableLayoutPanel, this.headerGroupBox });
 
             this.headerGroupBox.ResumeLayout(false);
             this.headerGroupBox.PerformLayout();

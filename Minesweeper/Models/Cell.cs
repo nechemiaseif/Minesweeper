@@ -10,8 +10,7 @@ namespace Minesweeper.Models
 
         public int Row { get; set; }
         public int Col { get; set; }
-        public bool HasMine { get; set; }
-        public CellNumber NumNeighborsWithMines { get; set; }
+        public CellValue CellValue { get; set; }
 
         public Cell(int row, int col)
         {
@@ -64,7 +63,7 @@ namespace Minesweeper.Models
                 return text;
             }
 
-            private set
+            set
             {
                 if (value != text)
                 {
@@ -115,17 +114,12 @@ namespace Minesweeper.Models
                 return IsFlagged ? "!" : "";
             }
 
-            if (HasMine)
+            return CellValue switch
             {
-                return "*";
-            }
-
-            if (NumNeighborsWithMines == CellNumber.Zero)
-            {
-                return "";
-            }
-
-            return NumNeighborsWithMines.ToString("D");
+                CellValue.Zero => "",
+                CellValue.Mine => "*",
+                _ => CellValue.ToString("D"),
+            };
         }
 
         public Color GetCellForeColor()
@@ -136,12 +130,12 @@ namespace Minesweeper.Models
                 return Color.Red;
             }
 
-            return NumNeighborsWithMines switch
+            return CellValue switch
             {
-                CellNumber.One => Color.Blue,
-                CellNumber.Two => Color.Green,
-                CellNumber.Three => Color.Red,
-                CellNumber.Four => Color.Purple,
+                CellValue.One => Color.Blue,
+                CellValue.Two => Color.Green,
+                CellValue.Three => Color.Red,
+                CellValue.Four => Color.Purple,
                 _ => Color.Black,
             };
         }

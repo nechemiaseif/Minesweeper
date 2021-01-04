@@ -34,6 +34,6 @@ namespace Minesweeper.Models
             }
         }
 
-        public bool WasBeaten() => Board.CellsRevealed == Board.Cols * Board.Rows;
+        public bool HasBeenWon() => Board.CellsRevealed == Board.Cols * Board.Rows - Board.Mines;
     }
 }
