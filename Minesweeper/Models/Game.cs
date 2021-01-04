@@ -10,10 +10,10 @@ namespace Minesweeper.Models
         public Difficulty Difficulty { get; set; }
         public Board Board { get; private set; }
 
-        public Game()
+        public Game(Difficulty difficulty)
         {
-            // TODO allow choosing difficulty
-            Board = new Board(Difficulty.Easy);
+            Difficulty = difficulty;
+            Board = new Board(Difficulty);
             TimeElapsed = new TimeSpan();
         }
 
@@ -37,4 +37,3 @@ namespace Minesweeper.Models
         public bool WasBeaten() => Board.CellsRevealed == Board.Cols * Board.Rows;
     }
 }
-

@@ -20,24 +20,44 @@ namespace Minesweeper
         private void InitializeComponent()
         {
             this.headerGroupBox = new GroupBox();
+            this.difficultyComboBox = new ComboBox();
             this.flagLabel = new Label();
             this.timer = new Timer();
             this.timerLabel = new Label();
-            this.tableLayoutPanel = new TableLayoutPanel();
+            this.boardTableLayoutPanel = new TableLayoutPanel();
+
+            this.headerGroupBox.SuspendLayout();
+            this.boardTableLayoutPanel.SuspendLayout();
             this.SuspendLayout();
 
             // 
             // headerGroupBox
             // 
-            this.headerGroupBox.Controls.AddRange(new Control[] { this.flagLabel, this.timerLabel });
+            this.headerGroupBox.Controls.AddRange(new Control[] { this.difficultyComboBox, this.flagLabel, this.timerLabel });
             this.headerGroupBox.Location = new Point(50, 25);
-            this.headerGroupBox.Size = new System.Drawing.Size(800, 100);
+            this.headerGroupBox.Dock = DockStyle.Top;
+
+            // 
+            // difficultyComboBox
+            // 
+            this.difficultyComboBox.Location = new Point(10, 30);
+            this.difficultyComboBox.Size = new Size(100, 30);
+            this.difficultyComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            foreach (Difficulty difficulty in Enum.GetValues(typeof(Difficulty)))
+            {
+                this.difficultyComboBox.Items.Add(difficulty);
+            }
+
+            this.difficultyComboBox.SelectedItem = Game.Difficulty;
+            this.difficultyComboBox.SelectedIndexChanged += new EventHandler(this.DifficultyComboBox_SelectedIndexChanged);
+
 
             //
             // flagLabel
             //
             this.flagLabel.DataBindings.Add("Text", Game.Board, "FlagsRemaining");
-            this.flagLabel.Location = new Point(60, 30);
+            this.flagLabel.Location = new Point(140, 30);
             this.flagLabel.AutoSize = true;
 
             //
@@ -50,38 +70,37 @@ namespace Minesweeper
             // timerLabel
             //
             this.timerLabel.DataBindings.Add("Text", Game, "TimeElapsed");
-            this.timerLabel.Location = new Point(120, 30);
+            this.timerLabel.Location = new Point(220, 30);
             this.timerLabel.AutoSize = true;
 
             //
             // tableLayoutPanel
             //
-            this.tableLayoutPanel.Name = "board";
-            this.tableLayoutPanel.Location = new Point(40, 160);
-            this.tableLayoutPanel.Size = new Size(500, 500);
-            this.tableLayoutPanel.AutoSize = true;
-            this.tableLayoutPanel.TabIndex = 0;
+            this.boardTableLayoutPanel.Name = "board";
+            this.boardTableLayoutPanel.Location = new Point(40, 160);
+            this.boardTableLayoutPanel.AutoSize = true;
+            this.boardTableLayoutPanel.Dock = DockStyle.Fill;
 
             // tableLayoutPanel - rows
-            this.tableLayoutPanel.RowCount = Game.Board.Rows;
+            this.boardTableLayoutPanel.RowCount = Game.Board.Rows;
 
-            for (int row = 0; row < this.tableLayoutPanel.RowCount; row++)
+            for (int row = 0; row < this.boardTableLayoutPanel.RowCount; row++)
             {
-                this.tableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F / this.tableLayoutPanel.RowCount));
+                this.boardTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F / this.boardTableLayoutPanel.RowCount));
             }
 
             // tableLayoutPanel - cols
-            this.tableLayoutPanel.ColumnCount = Game.Board.Cols;
+            this.boardTableLayoutPanel.ColumnCount = Game.Board.Cols;
 
-            for (int col = 0; col < this.tableLayoutPanel.ColumnCount; col++)
+            for (int col = 0; col < this.boardTableLayoutPanel.ColumnCount; col++)
             {
-                this.tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F / this.tableLayoutPanel.ColumnCount));
+                this.boardTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F / this.boardTableLayoutPanel.ColumnCount));
             }
 
             // tableLayoutPanel - buttons
-            for (int row = 0; row < this.tableLayoutPanel.RowCount; row++)
+            for (int row = 0; row < this.boardTableLayoutPanel.RowCount; row++)
             {
-                for (int col = 0; col < this.tableLayoutPanel.ColumnCount; col++)
+                for (int col = 0; col < this.boardTableLayoutPanel.ColumnCount; col++)
                 {
                     Button newButton = new Button();
 
@@ -92,8 +111,11 @@ namespace Minesweeper
                     newButton.DataBindings.Add("ForeColor", Game.Board.Grid[row, col], "ForeColor");
                     newButton.Font = new Font(newButton.Font, FontStyle.Bold);
                     newButton.Dock = DockStyle.Fill;
+                    newButton.Size = this.GetCellButtonSize();
+                    newButton.Margin = new Padding(0);
+                    newButton.Padding = new Padding(0);
 
-                    this.tableLayoutPanel.Controls.Add(newButton, col, row);
+                    this.boardTableLayoutPanel.Controls.Add(newButton, col, row);
                 }
             }
 
@@ -101,17 +123,21 @@ namespace Minesweeper
             // View
             // 
             this.Text = "Minesweeper";
-            this.Controls.AddRange(new Control[] { this.tableLayoutPanel, this.headerGroupBox });
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
-            this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(900, 700);
+            this.Controls.AddRange(new Control[] { this.boardTableLayoutPanel, this.headerGroupBox });
+            this.AutoSize = true;
+
+            this.headerGroupBox.ResumeLayout(false);
+            this.headerGroupBox.PerformLayout();
+            this.boardTableLayoutPanel.ResumeLayout(false);
+            this.boardTableLayoutPanel.PerformLayout();
             this.ResumeLayout(false);
         }
 
         private GroupBox headerGroupBox;
+        private ComboBox difficultyComboBox;
         private Label flagLabel, timerLabel;
         private Timer timer;
-        private TableLayoutPanel tableLayoutPanel;
+        private TableLayoutPanel boardTableLayoutPanel;
     }
 }
 

@@ -1,6 +1,7 @@
 ﻿using Minesweeper.Models;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace Minesweeper
@@ -9,11 +10,26 @@ namespace Minesweeper
     {
         private readonly Game Game;
 
-        public View()
+        public View(Difficulty difficulty = Difficulty.Easy)
         {
-            Game = new Game();
+            Game = new Game(difficulty);
 
             InitializeComponent();
+        }
+
+        private void DifficultyComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComboBox difficultyComboBox = (ComboBox)sender;
+            View newGameView = new View((Difficulty)difficultyComboBox.SelectedItem);
+
+            Hide();
+            newGameView.ShowDialog();
+            Close();
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            Game.TimeElapsed += TimeSpan.FromSeconds(1);
         }
 
         private void CellButton_Click(object sender, MouseEventArgs e)
@@ -53,12 +69,15 @@ namespace Minesweeper
             }
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private Size GetCellButtonSize() => Game.Difficulty switch
         {
-            Game.TimeElapsed += TimeSpan.FromSeconds(1);
-        }
+            Difficulty.Easy => new Size(50, 50),
+            Difficulty.Medium => new Size(40, 40),
+            _ => new Size(35, 35),
+        };
 
-        public void LoseGame()
+
+        private void LoseGame()
         {
             Game.Board.RevealAllMines();
             PromptRestart();
@@ -74,10 +93,15 @@ namespace Minesweeper
         {
             if (MessageBox.Show(Game.WasBeaten() ? "Play again?" : "Try again?", "Game Over", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                Process.Start(Process.GetCurrentProcess().MainModule.FileName);
+                Restart();
             }
 
             Application.Exit();
+        }
+
+        private void Restart()
+        {
+            Process.Start(Process.GetCurrentProcess().MainModule.FileName);
         }
     }
 }

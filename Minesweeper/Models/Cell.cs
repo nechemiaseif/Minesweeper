@@ -146,6 +146,16 @@ namespace Minesweeper.Models
             };
         }
 
-        public Color GetCellBackColor() => IsRevealed ? Color.Tan : Color.YellowGreen;
+        public Color GetCellBackColor()
+        {
+            bool isInEvenPosition = (Row + Col) % 2 == 0;
+
+            if (IsRevealed)
+            {
+                return isInEvenPosition ? Color.Wheat : Color.Tan;
+            }
+
+            return isInEvenPosition ? Color.GreenYellow : Color.YellowGreen;
+        }
     }
 }
